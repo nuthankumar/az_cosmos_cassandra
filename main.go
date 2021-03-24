@@ -1,27 +1,15 @@
 package main
 
-
-
-
 import (
-
 	"log"
-
 	"math/rand"
-
 	"os"
-
 	"strconv"
-
-
 	"time"
 
-
-
 	"github.com/nuthankumar/az_cosmos_cassandra/model"
-
 	"github.com/nuthankumar/az_cosmos_cassandra/operations"
-import (	"github.com/nuthankumar/az_cosmos_cassandra/utils"
+	"github.com/nuthankumar/az_cosmos_cassandra/utils"
 )
 
 var (
