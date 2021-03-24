@@ -1,15 +1,27 @@
 package main
 
+
+
+
 import (
+
 	"log"
+
 	"math/rand"
+
 	"os"
+
 	"strconv"
+
+
 	"time"
 
-	"github.com/Azure-Samples/azure-cosmos-db-cassandra-go-getting-started/model"
-	"github.com/Azure-Samples/azure-cosmos-db-cassandra-go-getting-started/operations"
-	"github.com/Azure-Samples/azure-cosmos-db-cassandra-go-getting-started/utils"
+
+
+	"github.com/nuthankumar/az_cosmos_cassandra/model"
+
+	"github.com/nuthankumar/az_cosmos_cassandra/operations"
+import (	"github.com/nuthankumar/az_cosmos_cassandra/utils"
 )
 
 var (
