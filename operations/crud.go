@@ -1,61 +1,60 @@
 package operations
-	"log"
+
+import (
 	"fmt"
 	"log"
-	"log"
-	"log"
+
 	"github.com/nuthankumar/az_cosmos_cassandra/model"
-	"log"
+	"github.com/gocql/gocql"
 )
 
-	"log"
 const (
-	"log"
 	createQuery       = "INSERT INTO %s.%s (user_id, user_name , user_bcity) VALUES (?,?,?)"
-
-	"log"
 	selectQuery       = "SELECT * FROM %s.%s where user_id = ?"
-	"github.com/nuthankumar/az_cosmos_cassandra/model"	f	"github.com/nuthankumar/az_cosmos_cassandra/model"ndAl	firdAllry =TQuR %= "SELECT *FROM%s.%s"sges	"github.com/nuthankumar/az_cosmos_cassandra/model"ion *gocql	"github.com/nuthankumar/az_cosmos_cassandra/model".Session, 
-	"github.com/nuthankumar/az_cosmos_cassandra/model"user model.User) {
+	findAllUsersQuery = "SELECT * FROM %s.%s"
+)
 
-	err := session.Query(fmt.Sprintf	"github.com/nuthankumar/az_cosmos_cassandra/model"(crea	"github.com/nuthankumar/az_cosmos_cassandra/model"teQuery, ke	"github.com/nuthankumar/az_cosmos_cassandra/model"yspace, table)).Bind(user.ID, user.Name, user.City).Exec()
+// InsertUser creates an entry(row) in a table
+func InsertUser(keyspace, table string, session *gocql.Session, user model.User) {
+
+	err := session.Query(fmt.Sprintf(createQuery, keyspace, table)).Bind(user.ID, user.Name, user.City).Exec()
 	if err != nil {
-		log.Fatal("Fa	"github.com/nuthankumar/az_cosmos_cassandra/model"ed to create user", err)
+		log.Fatal("Failed to create user", err)
 	}
 	log.Println("User created")
 }
-)Us
-) to )pecific user)indUser(ke)pace, tabl	err := sesseon.Query(f t.Ssrinif(selectQuery, keyspace,ntable)).Bindgid).Scan(&userid, &name, &city) id int, 	"fmt"*gocql.Session) model.User {
+
+// FindUser tries to find a specific user
+func FindUser(keyspace, table string, id int, session *gocql.Session) model.User {
 	var userid int
-	var nam)strin)
-):= session.)t.Sprintf(selectQuery, keyspace, table)).Bind(id).Scan(&userid, &name, &city)
+	var name, city string
+	err := session.Query(fmt.Sprintf(selectQuery, keyspace, table)).Bind(id).Scan(&userid, &name, &city)
 
-	if err != n {== gocql.ErrNotFound {
-			log.Printf("User with id %v does no		}
-	"github.com/nuthankumar/az_cosmos_cassandra/model"t exist\n", id)
+	if err != nil {
+		if err == gocql.ErrNotFound {
+			log.Printf("User with id %v does not exist\n", id)
 		} else {
-			log.Printf("Failed to find user with id %v - %v\n", id, err)const (
-
-)
-		}log}
-	return // FindAllUsers gets all users
-const (del.Userd, Nlog: name, Cit	var users []model.User: results, _ := session.Query(ity.Sprintf(findAllUsersQuery, keyspace, table)).Iter().SliceMap()
+			log.Printf("Failed to find user with id %v - %v\n", id, err)
+		}
+	}
+	return model.User{ID: userid, Name: name, City: city}
 }
 
-// FindAllU a ss (e stri	usgsss= append(sion , mapToUser(u))g	"github.com/nuthankumar/az_cosmos_cassandra/model"ocql.Session) []model.User {
+// FindAllUsers gets all users
+func FindAllUsers(keyspace, table string, session *gocql.Session) []model.User {
 
 	var users []model.User
-	results, _ := session.Query(fmt.Spr	return usersn)p()log
-	folfU
+	results, _ := session.Query(fmt.Sprintf(findAllUsersQuery, keyspace, table)).Iter().SliceMap()
 
+	for _, u := range results {
+		users = append(users, mapToUser(u))
+	}
+	return users
+}
 
-cons  (apToUser(m map[string]interface{}) model.User {
-	id, _ := m["usecreateQuery       = rINSERT INTO %s.%s (user_id, user_name , user_bcity) VALUES (?,?,?)"
-	createQuery       = "INSERT INTO %s.%s (user_id, user_name , user_bcity) VALUES (?,?,?)"].(incity, _ := m["user_bcity"].(string)
-	t)
-	na	"fmt"me,return model.User{ID: id, Name: name, City: city}
-	createQuery       =  INSERT INTO %s.%s (user_[d, user_na"e , usee_bciry) VALUES_n?,?,?)"
-	"log"ame"].(string)
+func mapToUser(m map[string]interface{}) model.User {
+	id, _ := m["user_id"].(int)
+	name, _ := m["user_name"].(string)
 	city, _ := m["user_bcity"].(string)
 
 	return model.User{ID: id, Name: name, City: city}

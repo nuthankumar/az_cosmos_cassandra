@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/Azure-Samples/azure-cosmos-db-cassandra-go-getting-started/utils"
+	"github.com/nuthankumar/az_cosmos_cassandra/utils"
 	"github.com/gocql/gocql"
 )
 

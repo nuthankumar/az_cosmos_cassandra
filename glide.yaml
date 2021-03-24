@@ -1,0 +1,8 @@
+package: .
+import:
+- package: github.com/Azure-Samples/azure-cosmos-db-cassandra-go-getting-started
+  subpackages:
+  - model
+  - operations
+  - utils
+- package: github.com/gocql/gocql
