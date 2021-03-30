@@ -51,7 +51,6 @@ type timer struct {
 func (t timer) ObserveQuery(ctx context.Context, oq gocql.ObservedQuery) {
 	log.Printf("Time taken for '%s' = %v ", oq.Statement, time.Since(oq.Start))
 }
-
 func (t timer) ObserveConnect(oc gocql.ObservedConnect) {
 	if oc.Err != nil {
 		log.Println("Connection error: ", oc.Err)
