@@ -1,7 +1,11 @@
 package operations
 
 import (
+	"strconv"
+	"strings"
+
 	"github.com/gocql/gocql"
+	"github.com/nuthankumar/az_cosmos_cassandra/utils"
 	utility "github.com/nuthankumar/az_cosmos_cassandra/utils"
 	sample "github.com/nuthankumar/cosmosdb/pkg/apis/dbprovision/v1"
 	"k8s.io/client-go/kubernetes"
@@ -24,6 +28,48 @@ func CreateCRD(data *sample.DBProvisioning, session *gocql.Session, clientset *k
 			utility.LogInfo("Provisioning successfull!")
 		}
 	}
+}
+
+func DeleteCRD(data *sample.DBProvisioning, session *gocql.Session, keyspacename, clientID string, client *kubernetes.Clientset) bool {
+	utility.LogInfo("DeleteCRD......clientid " + clientID)
+	if session == nil {
+		utility.LogInfo("Not Able to create session for delete CRD")
+		return false
+	}
+	utility.LogInfo("DeleteCRD.....GetSession")
+	var keyspaces []string = strings.Split(utils.StripSpaces(keyspacename), ",")
+	for _, keyspace := range keyspaces {
+		// create role
+		err := session.Query("DROP KEYSPACE IF EXISTS " + keyspace).Exec()
+		if err != nil {
+			if strings.Contains(err.Error(), "timeout") {
+				for i := 1; i < 4; i++ {
+					errnew := session.Query("DROP KEYSPACE IF EXISTS " + keyspace).Exec()
+					if errnew != nil {
+						utility.LogInfo("Try to Delete keyspace again...attempt:" + strconv.Itoa(i) + " " + errnew.Error())
+						if !strings.Contains(errnew.Error(), "timeout") {
+							utility.LogError("Error dropping keyspace " + keyspace + " with " + errnew.Error())
+							utility.LogError("Cleanup failed, Failed to drop keyspace")
+							session.Close()
+							return false
+						} else {
+							continue
+						}
+					}
+					break
+				}
+			} else {
+				utility.LogError("Error dropping keyspace " + keyspace + " with " + err.Error())
+				utility.LogError("Cleanup failed, Failed to drop keyspace")
+				session.Close()
+				return false
+			}
+		}
+		utility.LogInfo("DELETEING KEYSPACE --> " + keyspace)
+	}
+	session.Close()
+	utility.LogInfo("DeleteCRD.....done")
+	return true
 }
 
 // func UpdateCRD(oldData *sample.DBProvisioning, newData *sample.DBProvisioning, clientset *kubernetes.Clientset) {
